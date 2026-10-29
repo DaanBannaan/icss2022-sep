@@ -46,11 +46,15 @@ ASSIGNMENT_OPERATOR: ':=';
 
 //--- PARSER: ---
 stylesheet
-    : stylerule* EOF // EOF = End Of File
+    : (stylerule | variableAssignment)* EOF // EOF = End Of File
     ;
 
 stylerule
-    : selector OPEN_BRACE declaration* CLOSE_BRACE // * betekent 0 of meer
+    : selector OPEN_BRACE body CLOSE_BRACE
+    ;
+
+body
+    : (declaration | variableAssignment | ifClause)* // * betekent 0 of meer
     ;
 
 selector // selector = LOWER_IDENT of ID_IDENT of CLASS_IDENT
@@ -59,17 +63,44 @@ selector // selector = LOWER_IDENT of ID_IDENT of CLASS_IDENT
     | CLASS_IDENT
     ;
 
-declaration // dit betekent dat een declaratie bestaat uit een property, een dubbele punt, een concrete waarde en een puntkomma
-    : property COLON literal SEMICOLON
+declaration // dit betekent dat een declaratie bestaat uit een property, een dubbele punt, een expression en een puntkomma
+    : property COLON expression SEMICOLON
     ;
 
 property
     : LOWER_IDENT
     ;
 
+variableAssignment
+    : variableReference ASSIGNMENT_OPERATOR expression SEMICOLON
+    ;
+
+variableReference
+    : CAPITAL_IDENT
+    ;
+
+expression
+    : expression MUL expression                 # multiplyExpression // eerst vermenigvuldigen
+    | expression op=(PLUS | MIN) expression     # addSubtractExpression // dan optellen of aftrekken
+    | literal                                   # literalExpression
+    | variableReference                         # variableExpression
+    ;
+
 literal
     : PIXELSIZE
     | PERCENTAGE
+    | SCALAR // getal zonder eenheid
     | COLOR
+    | TRUE
+    | FALSE
     ;
 
+ifClause
+    : IF BOX_BRACKET_OPEN expression BOX_BRACKET_CLOSE
+      OPEN_BRACE body CLOSE_BRACE
+      elseClause? // optioneel
+    ;
+
+elseClause
+    : ELSE OPEN_BRACE body CLOSE_BRACE
+    ;
