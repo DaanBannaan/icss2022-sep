@@ -122,7 +122,7 @@ public class ASTListener extends ICSSBaseListener {
 	public void exitVariableReference(
 			ICSSParser.VariableReferenceContext contextobject) {
 
-		currentContainer.peek().addChild( // voegt de variableReference toe aan de assignment
+		currentContainer.peek().addChild( // voegt de variableReference toe
 				new VariableReference(contextobject.getText())
 		);
 	}

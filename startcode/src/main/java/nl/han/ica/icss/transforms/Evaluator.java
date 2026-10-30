@@ -16,8 +16,6 @@ public class Evaluator implements Transform {
     private final List<Map<String, Literal>> variableValues =
             new ArrayList<>(); // zoals in checker maar nu met waardes in plaats van types
 
-    public Evaluator() {}
-
     @Override
     public void apply(AST ast) {
         if (!ast.getErrors().isEmpty()) {
@@ -39,7 +37,7 @@ public class Evaluator implements Transform {
 
             for (ASTNode node : body) {
                 if (node instanceof VariableAssignment) {
-                    evaluateAssignment((VariableAssignment) node); // zet assignment in scope
+                    evaluateAssignment((VariableAssignment) node); // bereken variabelewaarde en zet in scope
 
                 } else if (node instanceof Declaration) {
                     Declaration declaration = (Declaration) node;
@@ -67,7 +65,7 @@ public class Evaluator implements Transform {
             return result;
         } finally {
 
-            variableValues.remove(variableValues.size() - 1); // verwijder lokale scope
+            variableValues.remove(variableValues.size() - 1); // verwijder lokale scope altijd
         }
     }
 
@@ -78,7 +76,7 @@ public class Evaluator implements Transform {
         Map<String, Literal> currentScope =
                 variableValues.get(variableValues.size() - 1);
 
-        currentScope.put(assignment.name.name, value); // voeg variabele toe aan scope
+        currentScope.put(assignment.name.name, value); // voeg variabelewaarde toe of vervang oude in scope
     }
 
     private Literal getVariableValue(VariableReference reference) {
@@ -184,7 +182,7 @@ public class Evaluator implements Transform {
             }
 
             throw new IllegalArgumentException(
-                    "Vermenigvuldigen vereist minstens één scalar."
+                    "Vermenigvuldigen vereist minstens 1 scalar."
             );
         }
 
